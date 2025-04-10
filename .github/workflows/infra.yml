@@ -1,4 +1,4 @@
-name: Terraform Deployment to Azure
+name: Terraform Deployment using OIDC
 
 on:
   push:
@@ -6,31 +6,30 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  id-token: write       # Required for OIDC
+  contents: read        # Required for actions/checkout
+
 env:
-  # These are used by Terraform, not azure/login
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
 jobs:
   terraform:
-    name: 'Terraform Apply'
+    name: 'Terraform OIDC Apply'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Log in to Azure using service principal
+      - name: Login to Azure using OIDC
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
-          
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
