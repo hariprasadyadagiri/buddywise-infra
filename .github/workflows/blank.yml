@@ -28,7 +28,7 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: buddywise-infra/infra
+        working-directory: buddywise-infra\infra
         env:
           ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -37,13 +37,13 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
-        working-directory: buddywise-infra/infra
+        working-directory: buddywise-infra\infra
 
       - name: Terraform Plan
         run: terraform plan -out=tfplan
-        working-directory: buddywise-infra/infra
+        working-directory: buddywise-infra\infra
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve tfplan
-        working-directory: buddywise-infra/infra
+        working-directory: buddywise-infra\infra
