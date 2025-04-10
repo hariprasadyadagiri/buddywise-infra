@@ -1,39 +1,52 @@
-name: Terraform Deploy
+name: Terraform Workflow
 
 on:
   push:
     branches:
       - main
 
-permissions:
-  id-token: write
-  contents: read
-
 jobs:
-  deploy:
+  terraform:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+    defaults:
+      run:
+        working-directory: infra
 
-      - name: Login to Azure with OIDC
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login via OIDC
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          auth-type: 'SERVICE_PRINCIPAL'
-          audience: api://AzureADTokenExchange
+          allow-no-subscriptions: false
+          enable-AzPSSession: false
+          auth-type: SERVICE_PRINCIPAL
 
-      - name: Set up Terraform
+      - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
 
       - name: Terraform Init
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan -var="AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" -var="AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" -var="AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+        run: terraform plan \
+          -var="AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" \
+          -var="AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" \
+          -var="AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var="AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" -var="AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" -var="AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+        run: terraform apply -auto-approve \
+          -var="AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" \
+          -var="AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" \
+          -var="AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
