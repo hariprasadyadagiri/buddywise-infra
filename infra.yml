@@ -28,7 +28,7 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: buddywise/infra
+        working-directory: Buddy\buddywise-infra\infra.yml
 
       - name: Terraform Validate
         run: terraform validate

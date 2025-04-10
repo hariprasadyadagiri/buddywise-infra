@@ -25,4 +25,4 @@ override.tf.json
 
 # Provider credentials (e.g., Azure, AWS)
 .terraformrc
-terraform.r
+terraform.rc
