@@ -1,30 +1,29 @@
-name: Terraform Workflow
+name: Terraform Deployment
 
 on:
   push:
     branches:
       - main
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   terraform:
+    name: 'Terraform OIDC Deploy'
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Azure Login via OIDC
+      - name: Azure Login with OIDC
         uses: azure/login@v1
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          allow-no-subscriptions: false
-          enable-AzPSSession: false
           auth-type: SERVICE_PRINCIPAL
 
       - name: Setup Terraform
@@ -36,13 +35,7 @@ jobs:
         run: terraform -chdir=infra init
 
       - name: Terraform Plan
-        run: terraform -chdir=infra plan \
-          -var="AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" \
-          -var="AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" \
-          -var="AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+        run: terraform -chdir=infra plan -var="AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" -var="AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" -var="AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
       - name: Terraform Apply
-        run: terraform -chdir=infra apply -auto-approve \
-          -var="AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" \
-          -var="AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" \
-          -var="AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+        run: terraform -chdir=infra apply -auto-approve -var="AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" -var="AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" -var="AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
