@@ -9,3 +9,7 @@ variable "AZURE_TENANT_ID" {
 variable "AZURE_SUBSCRIPTION_ID" {
   type = string
 }
+
+variable "AZURE_CLIENT_SECRET" {
+  type = string
+}
