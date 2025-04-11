@@ -5,6 +5,12 @@ on:
     branches:
       - main
 
+env:
+    ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+    ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+    ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+    ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
 jobs:
   terraform:
     name: 'Terraform Deploy'
@@ -26,35 +32,13 @@ jobs:
 
       - name: Terraform Init
         run: terraform -chdir=infra init 
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Force Unlock Terraform State (use only if locked)
         run: terraform -chdir=infra force-unlock -force 2753723c-cc67-e208-240d-203b98f173f5
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
   
-
       - name: Terraform plan  
-        run: terraform -chdir=infra plan #-var="AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" 
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        # - name: Terraform Plan
-      #   run: terraform -chdir=infra plan -var="AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" -var="AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" -var="AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-
+        run: terraform -chdir=infra plan 
+        
       - name: Terraform Apply
-        run: terraform -chdir=infra apply -auto-approve #-var="AZURE_CLIENT_ID=${{ secrets.AZURE_CLIENT_ID }}" -var="AZURE_TENANT_ID=${{ secrets.AZURE_TENANT_ID }}" -var="AZURE_SUBSCRIPTION_ID=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
-        env:
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: terraform -chdir=infra apply -auto-approve 
+        
