@@ -1,4 +1,4 @@
-# This file contains the main configuration for the Azure infrastructure using Terraform.
+
 resource "azurerm_resource_group" "rg" {
   name     = "buddy-wise"
   location = "westus"  
