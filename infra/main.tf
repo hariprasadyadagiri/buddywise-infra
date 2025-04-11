@@ -9,6 +9,9 @@ terraform {
     key                  = "terraform.tfstate"
   }
 }
+
+data "azurerm_client_config" "current" {}
+
 resource "azurerm_resource_group" "rg" {
   name     = "buddy-wise"
   location = "westus"  
